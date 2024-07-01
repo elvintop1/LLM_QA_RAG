@@ -1,0 +1,25 @@
+name: Build # name of the workflow 
+on: # Defines the events that trigger the workflow
+  push: # he workflow runs whenever there is a push to the `main` branch.
+    branches: 
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened] # opened, synchronized (e.g., new commits are pushed to the pull request branch), or reopened.
+jobs: #  Specifies the jobs to be run in the workflow. In this case, there is one job named sonarcloud.
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 # Here, it's the `actions/checkout@v3` action, which checks out your repository code.
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+# The workflow runs on pushes to the main branch and on pull request events (opened, synchronized, reopened).
+# It has one job named SonarCloud, which runs on an ubuntu-latest runner.
+# The job first checks out the code from the repository with full history.
+# Then, it runs a SonarCloud scan using the provided GitHub token and SonarCloud token for authentication and analysis.
